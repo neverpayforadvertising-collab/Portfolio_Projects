@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: experimentflow-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: experimentflow-frontend
+  template:
+    metadata:
+      labels:
+        app: experimentflow-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: experimentflow/frontend:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: experimentflow-frontend
+spec:
+  selector:
+    app: experimentflow-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
