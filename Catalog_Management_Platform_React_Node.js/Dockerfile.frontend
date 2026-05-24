@@ -1,0 +1,11 @@
+FROM node:20-alpine
+WORKDIR /app
+COPY package.json package-lock.json* ./
+COPY tsconfig.json ./
+COPY vite.config.ts ./
+COPY public ./public
+COPY src ./src
+RUN npm install --production
+RUN npm run build
+EXPOSE 4173
+CMD ["npm", "run", "serve"]
