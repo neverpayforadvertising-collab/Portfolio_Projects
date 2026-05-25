@@ -28,7 +28,7 @@ Full-stack operations platform for catalog, pricing, and inventory workflows.
 
 4. Access the frontend at `http://localhost:4173` and backend at `http://localhost:4000/api/v1`.
 
-## Scripts
+## How to run
 
 - `npm run dev` — run frontend and backend concurrently
 - `npm run build` — compile backend and frontend
