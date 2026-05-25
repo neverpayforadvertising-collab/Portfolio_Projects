@@ -36,8 +36,3 @@ uvicorn app.main:app --reload
 pytest -q
 ```
 
-Next steps
-- Implement production-grade vector store (Milvus/Weaviate/Pinecone)
-- Add LLM provider integration and prompt management
-- Implement observability (OpenTelemetry) and tracing
-- Add administrative UI and multi-tenant separation in Postgres
