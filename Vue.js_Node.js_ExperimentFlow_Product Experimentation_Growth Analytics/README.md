@@ -26,4 +26,3 @@ cd backend && npm run dev
 cd frontend && npm run dev
 ```
 
-This repo is a scaffold for ExperimentFlow. Implement features under `backend/` and `frontend/`.
