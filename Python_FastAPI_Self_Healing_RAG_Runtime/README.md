@@ -1,4 +1,4 @@
-# self-healing-rag-runtime
+# Self Healing RAG Runtime
 
 Production-grade self-improving RAG system
 
