@@ -1,6 +1,6 @@
 # self-healing-rag-runtime
 
-Production-grade self-improving RAG system scaffold for a senior full-stack portfolio project.
+Production-grade self-improving RAG system
 
 Overview
 - FastAPI backend orchestrating retrieval, reranking, and LLM generation.
