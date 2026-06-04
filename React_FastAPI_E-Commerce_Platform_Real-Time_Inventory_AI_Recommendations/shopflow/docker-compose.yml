@@ -2,12 +2,13 @@ version: "3.9"
 
 services:
   postgres:
-    image: postgres:17
+    image: postgres:15
     container_name: shopflow_postgres
+    restart: always
     environment:
+      POSTGRES_DB: shopflow
       POSTGRES_USER: shopflow
       POSTGRES_PASSWORD: shopflow
-      POSTGRES_DB: shopflow
     ports:
       - "5432:5432"
     volumes:
@@ -16,17 +17,41 @@ services:
   redis:
     image: redis:7
     container_name: shopflow_redis
+    restart: always
     ports:
       - "6379:6379"
 
-volumes:
-  postgres_data:
-
-product-service:
-    build: ./services/product-service
-    container_name: shopflow_product_service
+  backend:
+    build:
+      context: ./services/product-service
+    container_name: shopflow_backend
+    command: python -m uvicorn main:app --host 0.0.0.0 --port 8001 --reload
+    volumes:
+      - ./services/product-service:/app
     ports:
       - "8001:8001"
     depends_on:
       - postgres
-      # - redis
+      - redis
+    environment:
+      DATABASE_URL: postgresql://shopflow:shopflow@postgres:5432/shopflow
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: shopflow_frontend
+    command: npm start
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    environment:
+      REACT_APP_API_URL: http://localhost:8001
+
+volumes:
+  postgres_data:
