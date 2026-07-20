@@ -44,14 +44,23 @@ services:
         condition: service_started
     ports:
       - "4000:4000"
+    # CHANGED: healthcheck added — works now that /api/v1/health is public (no API key).
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:4000/api/v1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        # CHANGED: moved from runtime `environment` to build args — Vite env
+        # vars are baked into the bundle at BUILD time, so runtime env did nothing.
+        VITE_API_BASE_URL: http://localhost:4000/api/v1
+        VITE_API_KEY: supersecret-api-key
     container_name: catalog_frontend
-    environment:
-      - VITE_API_BASE_URL=http://localhost:4000/api/v1
     ports:
       - "4173:4173"
     depends_on:
