@@ -5,15 +5,39 @@ import { DataTable } from '../components/DataTable';
 
 function PricingPage() {
   const [filters, setFilters] = useState({ sku: '', region: '' });
-  const [overrideForm, setOverrideForm] = useState({ sku: '', region: '', adjustmentType: 'percent', adjustmentValue: 0, reason: '' });
-  const { data = [], isLoading, refetch } = useQuery(['pricing', filters], () => fetchPricingRules(filters));
-  const mutation = useMutation(overridePricing, {
+  // CHANGED: form state explicitly typed so adjustmentType stays the
+  // 'absolute' | 'percent' union expected by the API instead of widening to string.
+  const [overrideForm, setOverrideForm] = useState<{
+    sku: string;
+    region: string;
+    adjustmentType: 'absolute' | 'percent';
+    adjustmentValue: number;
+    reason: string;
+  }>({ sku: '', region: '', adjustmentType: 'percent', adjustmentValue: 0, reason: '' });
+
+  // CHANGED: migrated to TanStack Query v5 object API (was the removed v4
+  // positional signature useQuery(['pricing', filters], fn)).
+  const { data = [], isLoading, refetch } = useQuery({
+    queryKey: ['pricing', filters],
+    queryFn: () => fetchPricingRules(filters)
+  });
+
+  // CHANGED: v5 mutation API (was useMutation(overridePricing, {...})).
+  const mutation = useMutation({
+    mutationFn: overridePricing,
     onSuccess: () => {
       refetch();
     }
   });
 
-  const columns = [{ label: 'SKU', key: 'sku' }, { label: 'Region', key: 'region' }, { label: 'Adjustment', key: 'adjustmentValue' }, { label: 'Type', key: 'adjustmentType' }, { label: 'Reason', key: 'reason' }, { label: 'Created', key: 'createdAt' }];
+  const columns = [
+    { label: 'SKU', key: 'sku' },
+    { label: 'Region', key: 'region' },
+    { label: 'Adjustment', key: 'adjustmentValue' },
+    { label: 'Type', key: 'adjustmentType' },
+    { label: 'Reason', key: 'reason' },
+    { label: 'Created', key: 'createdAt' }
+  ];
 
   return (
     <div className="page-grid">
@@ -48,14 +72,23 @@ function PricingPage() {
         </label>
         <label>
           Adjustment type
-          <select value={overrideForm.adjustmentType} onChange={(event) => setOverrideForm({ ...overrideForm, adjustmentType: event.target.value as 'absolute' | 'percent' })}>
+          <select
+            value={overrideForm.adjustmentType}
+            onChange={(event) =>
+              setOverrideForm({ ...overrideForm, adjustmentType: event.target.value as 'absolute' | 'percent' })
+            }
+          >
             <option value="percent">Percent</option>
             <option value="absolute">Absolute</option>
           </select>
         </label>
         <label>
           Value
-          <input type="number" value={overrideForm.adjustmentValue} onChange={(event) => setOverrideForm({ ...overrideForm, adjustmentValue: Number(event.target.value) })} />
+          <input
+            type="number"
+            value={overrideForm.adjustmentValue}
+            onChange={(event) => setOverrideForm({ ...overrideForm, adjustmentValue: Number(event.target.value) })}
+          />
         </label>
         <label>
           Reason
