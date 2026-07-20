@@ -9,6 +9,7 @@ router.use('/catalog', catalogRoutes);
 router.use('/pricing', pricingRoutes);
 router.use('/inventory', inventoryRoutes);
 
-router.get('/health', (_, res) => res.status(200).json({ status: 'ok' }));
+// CHANGED: the GET /health route was removed from here and relocated to app.ts
+// so it is registered before the API-key middleware (public health probe).
 
 export default router;
