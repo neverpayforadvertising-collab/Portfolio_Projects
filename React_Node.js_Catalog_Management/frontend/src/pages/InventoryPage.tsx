@@ -6,12 +6,26 @@ import { DataTable } from '../components/DataTable';
 function InventoryPage() {
   const [filters, setFilters] = useState({ sku: '', region: '' });
   const [updateForm, setUpdateForm] = useState({ sku: '', region: '', quantity: 0, reason: '' });
-  const { data = [], isLoading, refetch } = useQuery(['inventory', filters], () => fetchInventory(filters));
-  const mutation = useMutation(updateInventory, {
+
+  // CHANGED: migrated to TanStack Query v5 object API (was the removed v4
+  // positional signature useQuery(['inventory', filters], fn)).
+  const { data = [], isLoading, refetch } = useQuery({
+    queryKey: ['inventory', filters],
+    queryFn: () => fetchInventory(filters)
+  });
+
+  // CHANGED: v5 mutation API (was useMutation(updateInventory, {...})).
+  const mutation = useMutation({
+    mutationFn: updateInventory,
     onSuccess: () => refetch()
   });
 
-  const columns = [{ label: 'SKU', key: 'sku' }, { label: 'Region', key: 'region' }, { label: 'Quantity', key: 'quantity' }, { label: 'Updated', key: 'lastUpdated' }];
+  const columns = [
+    { label: 'SKU', key: 'sku' },
+    { label: 'Region', key: 'region' },
+    { label: 'Quantity', key: 'quantity' },
+    { label: 'Updated', key: 'lastUpdated' }
+  ];
 
   return (
     <div className="page-grid">
