@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<!-- CHANGED: moved from frontend/public/index.html to the frontend root.
+     Vite requires index.html at the project root; in public/ it is copied
+     verbatim and never processed, so the app would not build or serve. -->
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Catalog Management Platform</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
