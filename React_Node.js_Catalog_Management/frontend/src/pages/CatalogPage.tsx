@@ -4,7 +4,6 @@ import { fetchProducts, saveProduct, scheduleBulkUpdate } from '../api/catalog';
 import { DataTable } from '../components/DataTable';
 import { FilterPanel } from '../components/FilterPanel';
 import { ProductForm } from '../components/ProductForm';
-import type { Product } from '../types';
 
 const initialFilters = { term: '', region: '', status: '' };
 
@@ -14,14 +13,24 @@ function CatalogPage() {
   const [bulkPrice, setBulkPrice] = useState('');
   const queryClient = useQueryClient();
 
-  const { data = [], isLoading } = useQuery(['products', filters], () => fetchProducts(filters));
-
-  const saveMutation = useMutation(saveProduct, {
-    onSuccess: () => queryClient.invalidateQueries(['products'])
+  // CHANGED: migrated to TanStack Query v5 object API. The installed package is
+  // v5, but the previous code used the removed v4 positional signature
+  // useQuery(['products', filters], fn), which throws at runtime under v5.
+  const { data = [], isLoading } = useQuery({
+    queryKey: ['products', filters],
+    queryFn: () => fetchProducts(filters)
   });
 
-  const bulkMutation = useMutation(scheduleBulkUpdate, {
-    onSuccess: () => queryClient.invalidateQueries(['products'])
+  // CHANGED: v5 mutation API — mutationFn option + object form of invalidateQueries.
+  const saveMutation = useMutation({
+    mutationFn: saveProduct,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] })
+  });
+
+  // CHANGED: v5 mutation API (was useMutation(scheduleBulkUpdate, {...})).
+  const bulkMutation = useMutation({
+    mutationFn: scheduleBulkUpdate,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['products'] })
   });
 
   const toggleSelection = (id: number) => {
@@ -54,7 +63,7 @@ function CatalogPage() {
           ) : (
             <DataTable
               columns={columns}
-              data={data as Record<string, unknown>[]}
+              data={data as unknown as Record<string, unknown>[]}
               onRowClick={(row) => toggleSelection(Number(row.id))}
               selectedRowIds={new Set(selected)}
             />
