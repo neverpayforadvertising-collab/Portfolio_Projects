@@ -13,6 +13,12 @@ app.use(cors({ origin: true, credentials: true }));
 app.use(helmet());
 app.use(express.json());
 app.use(logRequests);
+
+// CHANGED: health endpoint moved ABOVE validateApiKey. It previously lived in
+// routes/index.ts behind the API-key middleware, so Docker healthchecks and
+// load balancers received 401s. It must stay public.
+app.get('/api/v1/health', (_, res) => res.status(200).json({ status: 'ok' }));
+
 app.use(validateApiKey);
 app.use('/api/v1', routes);
 app.use(errorHandler);
